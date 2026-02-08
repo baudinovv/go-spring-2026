@@ -4,24 +4,26 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/NurmagambetovBakytzhan/spring26/cmd/internal/handlers"
+	"task-api/internal/handlers"
+	"task-api/internal/middleware"
 )
 
-// get student by id, post create student
-// net/http
-
-// middlware - auth
-
 func main() {
+	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
+		middleware.Logger(middleware.APIKeyAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.Method {
+				case "GET":
+					handlers.GetTasks(w, r)
+				case "POST":
+					handlers.CreateTask(w, r)
+				case "PATCH":
+					handlers.UpdateTask(w, r)
+				default:
+					http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			}
+		}))).ServeHTTP(w, r)
+	})
 
-	// GET localhost:8080/hello/
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world"))
-	}) 
-
-	http.HandleFunc("/students", handlers.CreateStudent)
-
+	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
-
-

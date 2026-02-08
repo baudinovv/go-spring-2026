@@ -1,3 +1,3 @@
-module github.com/baudinovv/go-spring-2026
+module task-api
 
-go 1.25.6
+go 1.21
